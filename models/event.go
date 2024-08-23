@@ -82,7 +82,7 @@ func (event Event) Update() error {
 	return err
 }
 
-func (event Event) DELETE() error {
+func (event Event) Delete() error {
 	query := "DELETE FROM events WHERE id=?"
 	stmt, err := db.DB.Prepare(query)
 	if err != nil {
@@ -91,6 +91,31 @@ func (event Event) DELETE() error {
 	defer stmt.Close()
 
 	_, err = stmt.Exec(event.ID)
+	return err
+
+}
+
+func (event Event) Register(userId int64) error {
+	query := "INSERT INTO registrations(event_id,user_id) VALUES (?,?)"
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(event.ID, userId)
+	return err
+}
+
+func (event Event) CancelRegistration(userId int64) error {
+	query := "DELETE FROM registrations WHERE event_id=? and user_id =?"
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(event.ID, userId)
 	return err
 
 }
